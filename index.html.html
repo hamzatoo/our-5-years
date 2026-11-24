@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>خمس سنوات من الحب ❤️ |  </title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Great+Vibes&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        * {
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #080a0f;
+            font-family: 'Cairo', sans-serif;
+            color: #ffffff;
+        }
+
+        /* Glassmorphism card */
+        .glass-card {
+            background: rgba(18, 24, 38, 0.65);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 105, 180, 0.2);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), inset 0 0 15px rgba(255, 51, 102, 0.15);
+        }
+
+        /* Glowing text effects */
+        .glow-text {
+            text-shadow: 0 0 10px rgba(255, 51, 102, 0.8), 0 0 20px rgba(255, 51, 102, 0.4), 0 0 30px rgba(255, 105, 180, 0.3);
+        }
+        .gold-glow {
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.8), 0 0 20px rgba(255, 165, 0, 0.5);
+        }
+
+        /* Envelope Start Button Animation */
+        .pulse-btn {
+            animation: btnPulse 2s infinite;
+        }
+        @keyframes btnPulse {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 51, 102, 0.7); }
+            70% { transform: scale(1.05); box-shadow: 0 0 0 20px rgba(255, 51, 102, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 51, 102, 0); }
+        }
+
+        /* Floating heart emoji animation */
+        @keyframes floatUp {
+            0% { opacity: 1; transform: translateY(0) scale(0.8) rotate(0deg); }
+            100% { opacity: 0; transform: translateY(-120px) scale(1.3) rotate(20deg); }
+        }
+        .floating-heart {
+            position: absolute;
+            pointer-events: none;
+            animation: floatUp 2.5s ease-out forwards;
+            z-index: 50;
+        }
+
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen relative overflow-hidden">
+
+    <!-- Canvas for Stars, Heart Drawing & Fireworks -->
+    <canvas id="mainCanvas"></canvas>
+
+    <!-- Phase 1: Intro Envelope / Welcome Overlay -->
+    <div id="introOverlay" class="relative z-20 flex flex-col items-center justify-center px-4 text-center transition-all duration-1000">
+        <div class="glass-card p-8 md:p-12 rounded-3xl max-w-md w-full border border-pink-500/30 flex flex-col items-center shadow-2xl">
+            <div class="w-20 h-20 mb-6 rounded-full bg-gradient-to-tr from-rose-500 to-pink-500 flex items-center justify-center shadow-lg shadow-pink-500/40 text-4xl text-white pulse-btn cursor-pointer">
+                <i class="fa-solid fa-heart animate-bounce"></i>
+            </div>
+            
+            <h1 class="text-3xl md:text-4xl font-extrabold mb-3 text-transparent bg-clip-text bg-gradient-to-r from-pink-300 via-rose-400 to-red-400">
+                ذكرى تعارفنا الـ 5 ❤️
+            </h1>
+            <p class="text-gray-300 mb-2 text-lg font-medium">25 نوفمبر</p>
+            <p class="text-sm text-pink-200/80 mb-8 leading-relaxed">
+                هناك مفاجأة صغيرة كُتبت لكِ بحب ... اكبسي للبدء ✨
+            </p>
+
+            <button id="startBtn" onclick="startExperience()" class="pulse-btn w-full py-4 px-8 rounded-full bg-gradient-to-r from-pink-600 via-rose-500 to-red-500 hover:from-pink-500 hover:to-rose-600 text-white font-bold text-xl shadow-lg shadow-pink-600/40 transform transition hover:scale-105 active:scale-95 flex items-center justify-center gap-3">
+                <span>افتحي الرسالة</span>
+                <i class="fa-solid fa-envelope-open-text"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Phase 2 & 3: Content Card Container (Appears after start) -->
+    <div id="messageCard" class="absolute z-10 opacity-0 pointer-events-none transition-opacity duration-1000 flex flex-col items-center justify-between h-full py-10 px-4 w-full max-w-2xl text-center">
+        <!-- Top Banner -->
+        <div class="glass-card py-3 px-8 rounded-full border border-pink-500/30 shadow-lg mt-2">
+            <span class="text-pink-300 font-semibold tracking-wide text-sm md:text-base">
+                ✨ 11/25  — 5 سنوات من الأيام الجميلة ✨
+            </span>
+        </div>
+
+        <!-- Center Space Reserved for Drawn Pulsing Heart -->
+        <div class="flex-1 w-full flex items-center justify-center">
+            <!-- Drawn Heart will surround this visually on Canvas -->
+        </div>
+
+        <!-- Bottom Romantic Love Message Container -->
+        <div class="glass-card p-6 md:p-8 rounded-3xl w-full border border-pink-500/30 shadow-2xl backdrop-blur-xl mb-4 transform transition-all duration-700 translate-y-6" id="bottomMsg">
+            <h2 class="text-2xl md:text-3xl font-extrabold text-pink-400 mb-2 glow-text">
+                كل سنة وأنتِ كل دنيتي ❤️
+            </h2>
+            <p class="text-gray-200 text-base md:text-lg leading-relaxed mb-4">
+                خمس سنوات مرّت كأجمل حلم... كل يوم معكِ هو سبب جديد لحب الدنيا الي عرفتني على ملاكي. شكراً لأنكِ أجمل تفاصيل عمري.
+            </p>
+            <div class="flex items-center justify-center gap-4 text-xs md:text-sm text-pink-300/80 font-mono border-t border-pink-500/20 pt-3">
+                <span>2020/11/25</span>
+                <span>•</span>
+                <span class="text-yellow-400 font-bold gold-glow">خمس سنين سوا</span>
+                <span>•</span>
+                <span>2025/11/25</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Interactive Floating Controls -->
+    <div id="controls" class="fixed bottom-4 left-4 z-30 flex gap-3 opacity-0 transition-opacity duration-500">
+        <button onclick="triggerSurpriseFireworks()" title="ألعاب نارية" class="w-12 h-12 rounded-full glass-card flex items-center justify-center text-yellow-300 hover:text-yellow-100 border border-yellow-500/30 shadow-lg hover:scale-110 active:scale-95 transition">
+            <i class="fa-solid fa-sparkles text-xl"></i>
+        </button>
+        <button id="musicToggleBtn" onclick="toggleAudio()" title="تشغيل / إيقاف الصوت" class="w-12 h-12 rounded-full glass-card flex items-center justify-center text-pink-300 hover:text-white border border-pink-500/30 shadow-lg hover:scale-110 active:scale-95 transition">
+            <i id="musicIcon" class="fa-solid fa-music text-xl"></i>
+        </button>
+    </div>
+
+    <script>
+        /* Global State & Setup */
+        const canvas = document.getElementById('mainCanvas');
+        const ctx = canvas.getContext('2d');
+        let width, height, dpr;
+
+        let animationStarted = false;
+        let heartPoints = [];
+        let drawnIndex = 0;
+        let isHeartComplete = false;
+        let pulseAngle = 0;
+        let pulseScale = 1;
+
+        // Arrays for effects
+        let fireworks = [];
+        let particles = [];
+        let stars = [];
+        let heartAuraParticles = [];
+
+        // Audio synthesizer using Web Audio API (No external files needed)
+        let audioCtx = null;
+        let isAudioPlaying = false;
+        let melodyInterval = null;
+
+        function resize() {
+            dpr = window.devicePixelRatio || 1;
+            width = window.innerWidth;
+            height = window.innerHeight;
+            canvas.width = width * dpr;
+            canvas.height = height * dpr;
+            ctx.scale(dpr, dpr);
+            generateHeartPoints();
+            initStars();
+        }
+
+        window.addEventListener('resize', resize);
+
+        /* 1. Generate Parametric Heart Coordinates */
+        function generateHeartPoints() {
+            heartPoints = [];
+            const totalPoints = 350;
+            // Adaptive heart scale based on screen width
+            const scale = Math.min(width, height) * (width < 640 ? 0.015 : 0.018);
+            
+            for (let i = 0; i < totalPoints; i++) {
+                const t = (i / totalPoints) * Math.PI * 2;
+                // Parametric Heart Formula
+                const x = 16 * Math.pow(Math.sin(t), 3);
+                const y = -(13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t));
+                
+                heartPoints.push({
+                    x: x * scale,
+                    y: y * scale
+                });
+            }
+        }
+
+        /* 2. Starry Background */
+        function initStars() {
+            stars = [];
+            const numStars = Math.floor((width * height) / 3000);
+            for (let i = 0; i < numStars; i++) {
+                stars.push({
+                    x: Math.random() * width,
+                    y: Math.random() * height,
+                    radius: Math.random() * 1.5 + 0.5,
+                    alpha: Math.random() * 0.8 + 0.2,
+                    speed: Math.random() * 0.02 + 0.005
+                });
+            }
+        }
+
+        function drawStars() {
+            ctx.save();
+            for (let star of stars) {
+                star.alpha += Math.sin(Date.now() * star.speed) * 0.01;
+                ctx.fillStyle = `rgba(255, 255, 255, ${Math.abs(star.alpha)})`;
+                ctx.beginPath();
+                ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            ctx.restore();
+        }
+
+        /* 3. Fireworks Engine */
+        class Firework {
+            constructor(sx, sy, tx, ty, color) {
+                this.x = sx;
+                this.y = sy;
+                this.sx = sx;
+                this.sy = sy;
+                this.tx = tx;
+                this.ty = ty;
+                this.distanceToTarget = Math.hypot(tx - sx, ty - sy);
+                this.distanceTraveled = 0;
+                this.coordinates = [];
+                this.coordinateCount = 3;
+                while (this.coordinateCount--) {
+                    this.coordinates.push([this.x, this.y]);
+                }
+                this.angle = Math.atan2(ty - sy, tx - sx);
+                this.speed = 6;
+                this.acceleration = 1.02;
+                this.brightness = Math.random() * 30 + 60;
+                this.targetRadius = 1;
+                this.color = color || `hsl(${Math.random() * 60 + 320}, 100%, 65%)`; // Pink/Gold hue
+            }
+
+            update(index) {
+                this.coordinates.pop();
+                this.coordinates.unshift([this.x, this.y]);
+                
+                this.speed *= this.acceleration;
+                const vx = Math.cos(this.angle) * this.speed;
+                const vy = Math.sin(this.angle) * this.speed;
+                
+                this.distanceTraveled = Math.hypot(this.x - this.sx, this.y - this.sy);
+
+                if (this.distanceTraveled >= this.distanceToTarget) {
+                    createParticles(this.tx, this.ty, this.color);
+                    fireworks.splice(index, 1);
+                } else {
+                    this.x += vx;
+                    this.y += vy;
+                }
+            }
+
+            draw() {
+                ctx.beginPath();
+                ctx.moveTo(this.coordinates[this.coordinates.length - 1][0], this.coordinates[this.coordinates.length - 1][1]);
+                ctx.lineTo(this.x, this.y);
+                ctx.strokeStyle = this.color;
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            }
+        }
+
+        function createParticles(x, y, color) {
+            const particleCount = 80;
+            for (let i = 0; i < particleCount; i++) {
+                const angle = (Math.PI * 2 / particleCount) * i + (Math.random() * 0.5);
+                const speed = Math.random() * 7 + 1;
+                particles.push({
+                    x: x,
+                    y: y,
+                    vx: Math.cos(angle) * speed,
+                    vy: Math.sin(angle) * speed,
+                    alpha: 1,
+                    decay: Math.random() * 0.02 + 0.01,
+                    gravity: 0.08,
+                    color: color
+                });
+            }
+        }
+
+        function drawParticles() {
+            for (let i = particles.length - 1; i >= 0; i--) {
+                const p = particles[i];
+                p.vx *= 0.96;
+                p.vy *= 0.96;
+                p.vy += p.gravity;
+                p.x += p.vx;
+                p.y += p.vy;
+                p.alpha -= p.decay;
+
+                if (p.alpha <= 0) {
+                    particles.splice(i, 1);
+                    continue;
+                }
+
+                ctx.save();
+                ctx.globalAlpha = p.alpha;
+                ctx.fillStyle = p.color;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, Math.random() * 2 + 1, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        function triggerRandomFirework() {
+            const sx = width / 2 + (Math.random() - 0.5) * (width * 0.6);
+            const sy = height;
+            const tx = width / 2 + (Math.random() - 0.5) * (width * 0.8);
+            const ty = height * 0.2 + Math.random() * (height * 0.4);
+            const colors = ['#ff3366', '#ff66b2', '#ffd700', '#ff99cc', '#ffffff'];
+            const color = colors[Math.floor(Math.random() * colors.length)];
+            fireworks.push(new Firework(sx, sy, tx, ty, color));
+        }
+
+        function triggerSurpriseFireworks() {
+            for (let i = 0; i < 5; i++) {
+                setTimeout(triggerRandomFirework, i * 200);
+            }
+        }
+
+        /* 4. Heart Aura Sparkles */
+        function spawnHeartAura(centerX, centerY) {
+            if (!isHeartComplete) return;
+            if (Math.random() > 0.3) return;
+
+            const randomPoint = heartPoints[Math.floor(Math.random() * heartPoints.length)];
+            heartAuraParticles.push({
+                x: centerX + randomPoint.x * pulseScale,
+                y: centerY + randomPoint.y * pulseScale,
+                vx: (Math.random() - 0.5) * 1.5,
+                vy: (Math.random() - 0.5) * 1.5 - 0.5,
+                alpha: 1,
+                size: Math.random() * 3 + 1,
+                color: Math.random() > 0.5 ? '#ff66b2' : '#ffd700'
+            });
+        }
+
+        function drawHeartAura() {
+            for (let i = heartAuraParticles.length - 1; i >= 0; i--) {
+                const p = heartAuraParticles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+                p.alpha -= 0.015;
+
+                if (p.alpha <= 0) {
+                    heartAuraParticles.splice(i, 1);
+                    continue;
+                }
+
+                ctx.save();
+                ctx.globalAlpha = p.alpha;
+                ctx.fillStyle = p.color;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        /* 5. Main Canvas Animation Loop */
+        function animate() {
+            ctx.fillStyle = 'rgba(8, 10, 15, 0.25)';
+            ctx.fillRect(0, 0, width, height);
+
+            drawStars();
+
+            // Render Fireworks
+            for (let i = fireworks.length - 1; i >= 0; i--) {
+                fireworks[i].draw();
+                fireworks[i].update(i);
+            }
+            drawParticles();
+
+            // Heart Drawing Logic
+            if (animationStarted) {
+                const centerX = width / 2;
+                const centerY = height * 0.42;
+
+                ctx.save();
+                ctx.translate(centerX, centerY);
+
+                if (!isHeartComplete) {
+                    // Phase 2: Drawing Point by Point
+                    drawnIndex += 3; // Speed of drawing line
+                    if (drawnIndex >= heartPoints.length) {
+                        drawnIndex = heartPoints.length;
+                        isHeartComplete = true;
+                        document.getElementById('messageCard').style.opacity = '1';
+                        document.getElementById('messageCard').style.pointerEvents = 'auto';
+                        document.getElementById('controls').style.opacity = '1';
+                        // Trigger initial celebration fireworks
+                        triggerSurpriseFireworks();
+                    }
+
+                    // Glow line effect
+                    ctx.shadowBlur = 20;
+                    ctx.shadowColor = '#ff1493';
+                    ctx.strokeStyle = '#ff3366';
+                    ctx.lineWidth = 4;
+                    ctx.lineCap = 'round';
+
+                    ctx.beginPath();
+                    for (let i = 0; i < drawnIndex; i++) {
+                        const pt = heartPoints[i];
+                        if (i === 0) ctx.moveTo(pt.x, pt.y);
+                        else ctx.lineTo(pt.x, pt.y);
+                    }
+                    ctx.stroke();
+
+                    // Leading glowing point
+                    if (drawnIndex < heartPoints.length) {
+                        const currentPt = heartPoints[drawnIndex - 1];
+                        ctx.fillStyle = '#ffffff';
+                        ctx.shadowBlur = 25;
+                        ctx.shadowColor = '#ffffff';
+                        ctx.beginPath();
+                        ctx.arc(currentPt.x, currentPt.y, 6, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                } else {
+                    // Phase 3: Heart Dancing & Pulsing
+                    pulseAngle += 0.05;
+                    pulseScale = 1 + Math.sin(pulseAngle) * 0.06; // Smooth rhythm pulse
+
+                    ctx.scale(pulseScale, pulseScale);
+
+                    // Outer Glowing Back-Heart
+                    ctx.shadowBlur = 35;
+                    ctx.shadowColor = '#ff0066';
+                    ctx.strokeStyle = 'rgba(255, 51, 102, 0.9)';
+                    ctx.lineWidth = 5;
+
+                    ctx.beginPath();
+                    for (let i = 0; i < heartPoints.length; i++) {
+                        const pt = heartPoints[i];
+                        if (i === 0) ctx.moveTo(pt.x, pt.y);
+                        else ctx.lineTo(pt.x, pt.y);
+                    }
+                    ctx.closePath();
+                    ctx.stroke();
+
+                    // Inner softer glow line
+                    ctx.shadowBlur = 10;
+                    ctx.shadowColor = '#ffd700';
+                    ctx.strokeStyle = '#ff99cc';
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+
+                    // Periodically release subtle fireworks in background
+                    if (Math.random() < 0.025) {
+                        triggerRandomFirework();
+                    }
+                }
+
+                ctx.restore();
+
+                spawnHeartAura(centerX, centerY);
+                drawHeartAura();
+            }
+
+            requestAnimationFrame(animate);
+        }
+
+        /* 6. Audio Synthesizer (Ambient Soft Melody) */
+        function initAudio() {
+            if (audioCtx) return;
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            audioCtx = new AudioContext();
+        }
+
+        function playSoftNote(freq, duration = 1.5) {
+            if (!audioCtx || audioCtx.state !== 'running') return;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+
+            gain.gain.setValueAtTime(0.01, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.15, audioCtx.currentTime + 0.2);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            osc.start();
+            osc.stop(audioCtx.currentTime + duration);
+        }
+
+        function startMelody() {
+            // Sweet romantic pentatonic notes (Hz)
+            const notes = [261.63, 293.66, 329.63, 392.00, 440.00, 523.25];
+            let step = 0;
+
+            melodyInterval = setInterval(() => {
+                if (!isAudioPlaying) return;
+                const note = notes[step % notes.length];
+                playSoftNote(note, 2.0);
+                if (step % 3 === 0) {
+                    playSoftNote(note / 2, 2.5); // Warm bass note
+                }
+                step++;
+            }, 800);
+        }
+
+        function toggleAudio() {
+            initAudio();
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+
+            const icon = document.getElementById('musicIcon');
+            if (isAudioPlaying) {
+                isAudioPlaying = false;
+                clearInterval(melodyInterval);
+                icon.className = "fa-solid fa-music-slash text-xl text-gray-400";
+            } else {
+                isAudioPlaying = true;
+                startMelody();
+                icon.className = "fa-solid fa-music text-xl text-pink-300 animate-pulse";
+            }
+        }
+
+        /* 7. Interactive Tap/Click Float Hearts */
+        window.addEventListener('click', (e) => {
+            // Ignore click if it's on controls or start button
+            if (e.target.closest('#introOverlay') || e.target.closest('#controls')) return;
+
+            const heart = document.createElement('div');
+            heart.className = 'floating-heart text-2xl';
+            heart.innerHTML = ['❤️', '💖', '✨', '💕', '🌹'][Math.floor(Math.random() * 5)];
+            heart.style.left = (e.clientX - 12) + 'px';
+            heart.style.top = (e.clientY - 12) + 'px';
+            document.body.appendChild(heart);
+
+            setTimeout(() => heart.remove(), 2500);
+        });
+
+        /* 8. Trigger Experience Start */
+        function startExperience() {
+            const intro = document.getElementById('introOverlay');
+            intro.style.opacity = '0';
+            intro.style.transform = 'scale(0.9)';
+            
+            setTimeout(() => {
+                intro.style.display = 'none';
+                animationStarted = true;
+                // Start music automatically on click
+                toggleAudio();
+            }, 800);
+        }
+
+        // Initialize Canvas & Start Loop
+        window.onload = () => {
+            resize();
+            animate();
+        };
+    </script>
+</body>
+</html>
